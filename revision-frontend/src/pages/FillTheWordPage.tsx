@@ -161,22 +161,21 @@ const FillTheWordPage: React.FC = () => {
   };
 
   const generateWordOptions = (line: ParsedLine, removedWords: string[]) => {
-    const allWords = line.words.filter(word => !removedWords.includes(word));
     const options = [...removedWords];
-
-    const shuffled = allWords.sort(() => Math.random() - 0.5);
-    const additionalOptions = shuffled.slice(0, Math.max(0, 4 - removedWords.length));
-    options.push(...additionalOptions);
-
-    const commonWords = ['the', 'and', 'for', 'with', 'this', 'that', 'from', 'they', 'have', 'been'];
-    while (options.length < 4 && commonWords.length > 0) {
-      const randomWord = commonWords.splice(Math.floor(Math.random() * commonWords.length), 1)[0];
-      if (!options.includes(randomWord)) {
-        options.push(randomWord);
+    const otherWords = line.words.filter(word => !removedWords.includes(word));
+    const commonWords = ['the', 'and', 'for', 'with', 'this', 'that', 'from', 'they', 'have', 'been', 'are', 'was', 'were', 'will', 'would', 'could', 'should', 'can', 'may', 'might', 'must', 'shall', 'do', 'does', 'did', 'has', 'had', 'get', 'got', 'make', 'made', 'take', 'took', 'come', 'came', 'go', 'went', 'see', 'saw', 'know', 'knew', 'think', 'thought', 'say', 'said', 'tell', 'told', 'give', 'gave'];
+    
+    const allDistractors = [...otherWords, ...commonWords];
+    
+    while (options.length < 8 && allDistractors.length > 0) {
+      const randomIndex = Math.floor(Math.random() * allDistractors.length);
+      const word = allDistractors.splice(randomIndex, 1)[0];
+      if (!options.includes(word)) {
+        options.push(word);
       }
     }
 
-    return options.sort(() => Math.random() - 0.5);
+    return options.slice(0, 8).sort(() => Math.random() - 0.5);
   };
 
   const generateHighlightedDisplayText = () => {
@@ -394,6 +393,10 @@ const FillTheWordPage: React.FC = () => {
     );
   }
 
+  const handleSkipLine = () => {
+    moveToNextLine();
+  };
+
   const wordOptions = generateWordOptions(gameState.currentLine, gameState.currentRemovedWords);
 
   return (
@@ -441,6 +444,26 @@ const FillTheWordPage: React.FC = () => {
               <p className="text-body text-text-primary font-medium flex flex-wrap gap-1 justify-center">
                 {generateHighlightedDisplayText()}
               </p>
+              
+              {/* Progress Bar for Current Sentence */}
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-caption text-text-secondary">
+                    Progress: {gameState.currentLine.currentDifficulty} / {Math.max(1, Math.ceil(gameState.currentLine.words.length * MAX_DIFFICULTY_FRACTION))} difficulty levels
+                  </span>
+                  <span className="text-caption text-text-muted">
+                    {Math.round((gameState.currentLine.currentDifficulty / Math.max(1, Math.ceil(gameState.currentLine.words.length * MAX_DIFFICULTY_FRACTION))) * 100)}%
+                  </span>
+                </div>
+                <div className="w-full bg-light-gray rounded-pill h-2">
+                  <div 
+                    className="bg-muted-blue rounded-pill h-2 transition-gentle"
+                    style={{ 
+                      width: `${Math.min(100, (gameState.currentLine.currentDifficulty / Math.max(1, Math.ceil(gameState.currentLine.words.length * MAX_DIFFICULTY_FRACTION))) * 100)}%` 
+                    }}
+                  ></div>
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -457,7 +480,7 @@ const FillTheWordPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-6">
               {wordOptions.map((word, index) => (
                 <button
                   key={index}
@@ -467,6 +490,16 @@ const FillTheWordPage: React.FC = () => {
                   {word}
                 </button>
               ))}
+            </div>
+
+            {/* Skip Button */}
+            <div className="text-center mt-6">
+              <button
+                onClick={handleSkipLine}
+                className="px-4 py-2 rounded-soft font-medium border border-light-gray text-text-secondary transition-gentle hover:opacity-90 bg-transparent hover:bg-light-gray hover:bg-opacity-50 text-body-sm"
+              >
+                Skip this line
+              </button>
             </div>
           </>
         )}
