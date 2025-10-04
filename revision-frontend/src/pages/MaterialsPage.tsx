@@ -104,13 +104,15 @@ const MaterialsPage: React.FC = () => {
               Organize and manage your study content
             </p>
           </div>
-          <button
-            onClick={handleAddMaterial}
-            className="px-6 py-3 rounded-soft font-medium text-warm-white transition-gentle hover:opacity-90 bg-muted-blue flex items-center"
-          >
-            <span className="mr-2">📚</span>
-            Add Material
-          </button>
+          {materials.length > 0 && (
+            <button
+              onClick={handleAddMaterial}
+              className="px-6 py-3 rounded-soft font-medium text-warm-white transition-gentle hover:opacity-90 bg-muted-blue flex items-center"
+            >
+              <span className="mr-2">📚</span>
+              Add Material
+            </button>
+          )}
         </div>
 
         {/* Empty State */}
@@ -138,42 +140,6 @@ const MaterialsPage: React.FC = () => {
                 Create Your First Material
               </button>
               
-              {/* Helpful Tips */}
-              <div className="mt-12 p-6 rounded-card bg-warm-white border border-light-gray shadow-soft">
-                <h3 className="text-h3 font-medium text-text-primary mb-4">
-                  💡 What can you add?
-                </h3>
-                <div className="grid md:grid-cols-2 gap-4 text-left">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-body-sm text-text-secondary">
-                      <span className="mr-2">📖</span>
-                      Chapter summaries
-                    </div>
-                    <div className="flex items-center text-body-sm text-text-secondary">
-                      <span className="mr-2">🧮</span>
-                      Formula sheets
-                    </div>
-                    <div className="flex items-center text-body-sm text-text-secondary">
-                      <span className="mr-2">🗺️</span>
-                      Concept maps
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-body-sm text-text-secondary">
-                      <span className="mr-2">📝</span>
-                      Study notes
-                    </div>
-                    <div className="flex items-center text-body-sm text-text-secondary">
-                      <span className="mr-2">❓</span>
-                      Practice questions
-                    </div>
-                    <div className="flex items-center text-body-sm text-text-secondary">
-                      <span className="mr-2">🎯</span>
-                      Key definitions
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         ) : (
