@@ -235,8 +235,10 @@ const FillTheWordPage: React.FC = () => {
     
     const line = gameState.currentLine;
     
-    // Check if the selected word is one of the correct words that needs to be filled
-    const isCorrect = gameState.currentRemovedWords.includes(selectedWord);
+    // Check if the selected word is correct for the current blank position
+    const currentBlankIndex = gameState.currentBlankIndex;
+    const correctWordForThisBlank = gameState.currentRemovedWords[currentBlankIndex];
+    const isCorrect = selectedWord === correctWordForThisBlank;
     
     if (isCorrect) {
       // Correct word selected - add to selections and move to next blank
