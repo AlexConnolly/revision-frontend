@@ -201,7 +201,14 @@ const MaterialsPage: React.FC = () => {
                   </div>
                   
                   <div className="mb-4">
-                    <p className="text-body-sm text-text-secondary line-clamp-3 leading-relaxed">
+                    <p 
+                      className="text-body-sm text-text-secondary leading-relaxed overflow-hidden"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical'
+                      }}
+                    >
                       {material.extract}
                     </p>
                   </div>

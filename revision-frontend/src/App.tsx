@@ -6,12 +6,7 @@ import { DialogProvider } from './components/DialogProvider';
 function App() {
   // Navigation items
   const navigationItems = [
-    { label: 'Dashboard', route: '/dashboard', icon: '📊' },
-    { label: 'Materials', route: '/materials', icon: '📚' },
-    { label: 'Study Sessions', route: '/study', icon: '🎯' },
-    { label: 'Flashcards', route: '/flashcards', icon: '🃏' },
-    { label: 'Progress', route: '/progress', icon: '📈' },
-    { label: 'Settings', route: '/settings', icon: '⚙️' }
+    { label: 'Materials', route: '/materials', icon: '📚' }
   ];
 
   return (
