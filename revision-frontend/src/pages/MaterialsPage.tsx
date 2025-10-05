@@ -81,6 +81,14 @@ const MaterialsPage: React.FC = () => {
     }
   };
 
+  const handleSayItOutLoud = (id: string) => {
+    const material = materials.find(m => m.id === id);
+    if (material) {
+      console.log('Starting Say It Out Loud for:', material.name);
+      navigate(`/say-it-out-loud/${id}`);
+    }
+  };
+
   const handleEditMaterial = async (material: RevisionMaterial) => {
     try {
       const result = await showDialogWithResult<CreateRevisionMaterialData>({
@@ -235,13 +243,22 @@ const MaterialsPage: React.FC = () => {
                     <h4 className="text-body-sm font-medium text-text-primary mb-3">
                       Revise
                     </h4>
-                    <button
-                      onClick={() => handleFillTheWord(material.id)}
-                      className="w-full px-4 py-2 rounded-soft font-medium text-warm-white transition-gentle hover:opacity-90 bg-forest-green text-body-sm"
-                    >
-                      <span className="mr-2">✏️</span>
-                      Fill the word
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleFillTheWord(material.id)}
+                        className="w-full px-4 py-2 rounded-soft font-medium text-warm-white transition-gentle hover:opacity-90 bg-forest-green text-body-sm"
+                      >
+                        <span className="mr-2">✏️</span>
+                        Fill the word
+                      </button>
+                      <button
+                        onClick={() => handleSayItOutLoud(material.id)}
+                        className="w-full px-4 py-2 rounded-soft font-medium text-warm-white transition-gentle hover:opacity-90 bg-muted-blue text-body-sm"
+                      >
+                        <span className="mr-2">🗣️</span>
+                        Say it out loud
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-between text-caption text-text-muted pt-3 mt-4 border-t border-light-gray">

@@ -161,12 +161,19 @@ const FillTheWordPage: React.FC = () => {
   };
 
   const generateWordOptions = (line: ParsedLine, removedWords: string[]) => {
+    // If we have 8 or more removed words, just return them (shuffled)
+    if (removedWords.length >= 8) {
+      return [...removedWords].sort(() => Math.random() - 0.5);
+    }
+
+    // Start with ALL the correct answers
     const options = [...removedWords];
     const otherWords = line.words.filter(word => !removedWords.includes(word));
     const commonWords = ['the', 'and', 'for', 'with', 'this', 'that', 'from', 'they', 'have', 'been', 'are', 'was', 'were', 'will', 'would', 'could', 'should', 'can', 'may', 'might', 'must', 'shall', 'do', 'does', 'did', 'has', 'had', 'get', 'got', 'make', 'made', 'take', 'took', 'come', 'came', 'go', 'went', 'see', 'saw', 'know', 'knew', 'think', 'thought', 'say', 'said', 'tell', 'told', 'give', 'gave'];
     
     const allDistractors = [...otherWords, ...commonWords];
     
+    // Add distractors until we have exactly 8 total
     while (options.length < 8 && allDistractors.length > 0) {
       const randomIndex = Math.floor(Math.random() * allDistractors.length);
       const word = allDistractors.splice(randomIndex, 1)[0];
@@ -175,7 +182,7 @@ const FillTheWordPage: React.FC = () => {
       }
     }
 
-    return options.slice(0, 8).sort(() => Math.random() - 0.5);
+    return options.sort(() => Math.random() - 0.5);
   };
 
   const generateHighlightedDisplayText = () => {
@@ -397,6 +404,38 @@ const FillTheWordPage: React.FC = () => {
     moveToNextLine();
   };
 
+  const handleJumpToLine = (lineIndex: number) => {
+    if (lineIndex >= 0 && lineIndex < parsedLines.length) {
+      const newLine = parsedLines[lineIndex];
+      setGameState(prev => ({
+        ...prev,
+        currentLineIndex: lineIndex,
+        currentLine: newLine,
+        userSelections: [],
+        targetSelections: [],
+        currentRemovedWords: [],
+        currentDisplayText: '',
+        removedPositions: [],
+        showResult: false,
+        correctWord: '',
+        expectedWordsStack: []
+      }));
+      updateCurrentLineDisplay(newLine);
+    }
+  };
+
+  const handlePreviousLine = () => {
+    if (gameState.currentLineIndex > 0) {
+      handleJumpToLine(gameState.currentLineIndex - 1);
+    }
+  };
+
+  const handleNextLine = () => {
+    if (gameState.currentLineIndex < parsedLines.length - 1) {
+      handleJumpToLine(gameState.currentLineIndex + 1);
+    }
+  };
+
   const wordOptions = generateWordOptions(gameState.currentLine, gameState.currentRemovedWords);
 
   return (
@@ -412,6 +451,59 @@ const FillTheWordPage: React.FC = () => {
         >
           ← Back to Materials
         </button>
+      </div>
+
+      {/* Line Navigation */}
+      <div className="mb-6 p-4 rounded-card bg-warm-white border border-light-gray shadow-soft">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-h3 font-medium text-text-primary">Line Navigation</h3>
+          <span className="text-body-sm text-text-secondary">
+            {gameState.currentLineIndex + 1} / {gameState.totalLines}
+          </span>
+        </div>
+        
+        <div className="space-y-4">
+          {/* Previous/Next Buttons - Mobile Stacked */}
+          <div className="flex gap-2 w-full">
+            <button
+              onClick={handlePreviousLine}
+              disabled={gameState.currentLineIndex === 0}
+              className="flex-1 px-3 py-2 rounded-soft font-medium border border-light-gray text-text-primary transition-gentle hover:opacity-90 bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              ← Previous
+            </button>
+            <button
+              onClick={handleNextLine}
+              disabled={gameState.currentLineIndex === gameState.totalLines - 1}
+              className="flex-1 px-3 py-2 rounded-soft font-medium border border-light-gray text-text-primary transition-gentle hover:opacity-90 bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next →
+            </button>
+          </div>
+
+          {/* Jump to Line Dropdown - Full Width */}
+          <div>
+            <label htmlFor="line-select" className="block text-body-sm font-medium text-text-primary mb-2">
+              Jump to line:
+            </label>
+            <select
+              id="line-select"
+              value={gameState.currentLineIndex}
+              onChange={(e) => handleJumpToLine(parseInt(e.target.value))}
+              className="w-full px-3 py-2 rounded-soft border border-light-gray focus:border-muted-blue focus:outline-none transition-gentle text-body bg-warm-white"
+            >
+              {parsedLines.map((line, index) => {
+                const preview = line.words.slice(0, 4).join(' ');
+                const suffix = line.words.length > 4 ? '...' : '';
+                return (
+                  <option key={index} value={index}>
+                    {preview}{suffix}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="mb-8 p-4 rounded-card bg-warm-white border border-light-gray shadow-soft">

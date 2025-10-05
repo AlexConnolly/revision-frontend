@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import MaterialsPage from '../pages/MaterialsPage';
 import FillTheWordPage from '../pages/FillTheWordPage';
+import SayItOutLoudPage from '../pages/SayItOutLoudPage';
 
 interface AppRouterProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ const AppRouter: React.FC<AppRouterProps> = ({ children }) => {
           {/* Main application routes */}
           <Route path="materials" element={<MaterialsPage />} />
           <Route path="fill-the-word/:id" element={<FillTheWordPage />} />
+          <Route path="say-it-out-loud/:id" element={<SayItOutLoudPage />} />
           
           {/* 404 fallback */}
           <Route path="*" element={<NotFoundPage />} />
