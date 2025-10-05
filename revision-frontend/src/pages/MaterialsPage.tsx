@@ -4,6 +4,7 @@ import { useDialog } from '../components/DialogProvider';
 import { RevisionMaterial, CreateRevisionMaterialData } from '../types/RevisionMaterial';
 import { revisionMaterialRepository } from '../repositories/RevisionMaterialRepository';
 import AddRevisionMaterialDialog, { AddRevisionMaterialDialogRef } from '../components/AddRevisionMaterialDialog';
+import EditRevisionMaterialDialog, { EditRevisionMaterialDialogRef } from '../components/EditRevisionMaterialDialog';
 
 const MaterialsPage: React.FC = () => {
   const { showDialogWithResult } = useDialog();
@@ -11,6 +12,7 @@ const MaterialsPage: React.FC = () => {
   const [materials, setMaterials] = useState<RevisionMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const dialogRef = useRef<AddRevisionMaterialDialogRef>(null);
+  const editDialogRef = useRef<EditRevisionMaterialDialogRef>(null);
 
   // Load materials on component mount
   useEffect(() => {
@@ -76,6 +78,44 @@ const MaterialsPage: React.FC = () => {
     if (material) {
       console.log('Starting Fill the Word for:', material.name);
       navigate(`/fill-the-word/${id}`);
+    }
+  };
+
+  const handleEditMaterial = async (material: RevisionMaterial) => {
+    try {
+      const result = await showDialogWithResult<CreateRevisionMaterialData>({
+        title: "Edit Revision Material",
+        icon: "✏️",
+        width: "max-w-2xl",
+        component: <EditRevisionMaterialDialog ref={editDialogRef} initialMaterial={material} />,
+        submit: {
+          text: "Update Material",
+          onValidate: async () => {
+            if (!editDialogRef.current?.validateForm()) {
+              throw new Error('Please fix the errors in the form');
+            }
+          },
+          onGetResult: async () => {
+            const formData = editDialogRef.current?.getFormData();
+            if (!formData) {
+              throw new Error('Failed to get form data');
+            }
+            return formData;
+          }
+        }
+      });
+
+      // Update the material
+      const updatedMaterial = revisionMaterialRepository.update(material.id, result);
+      if (updatedMaterial) {
+        setMaterials(prev => prev.map(m => m.id === material.id ? updatedMaterial : m));
+      }
+      
+    } catch (error) {
+      console.error('Error editing material:', error);
+    } finally {
+      // Reset the form after dialog closes
+      editDialogRef.current?.resetForm();
     }
   };
 
@@ -155,15 +195,26 @@ const MaterialsPage: React.FC = () => {
                     <h3 className="text-h3 font-medium text-text-primary flex-1 mr-2 line-clamp-2">
                       {material.name}
                     </h3>
-                    <button
-                      onClick={() => handleDeleteMaterial(material.id)}
-                      className="p-2 rounded-soft text-text-muted hover:text-muted-red hover:bg-muted-red hover:bg-opacity-10 transition-gentle opacity-0 group-hover:opacity-100"
-                      title="Delete material"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-gentle">
+                      <button
+                        onClick={() => handleEditMaterial(material)}
+                        className="p-2 rounded-soft text-text-muted hover:text-muted-blue hover:bg-muted-blue hover:bg-opacity-10 transition-gentle"
+                        title="Edit material"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMaterial(material.id)}
+                        className="p-2 rounded-soft text-text-muted hover:text-muted-red hover:bg-muted-red hover:bg-opacity-10 transition-gentle"
+                        title="Delete material"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="mb-4">
